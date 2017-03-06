@@ -7,4 +7,4 @@ tail -n +2 kingella_genome_list.txt | cut -f20 | sed -s "s/\(.*\)\/\(.*\)$/\1\/\
 mkdir raw_genome_sequences
 cd raw_genomde_sequences
 wget -i ../kingella_genome_adresses.txt
-
+gzip -d * 
