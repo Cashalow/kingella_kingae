@@ -5,6 +5,6 @@ wget $kingella_genome_list_adress -O kingella_genome_list.txt
 tail -n +2 kingella_genome_list.txt | cut -f20 | sed -s "s/\(.*\)\/\(.*\)$/\1\/\2\/\2\_genomic.fna.gz/" | sed -s "s/\r//g" > kingella_genome_adresses.txt
 
 mkdir raw_genome_sequences
-cd raw_genomde_sequences
+cd raw_genome_sequences
 wget -i ../kingella_genome_adresses.txt
 gzip -d * 
