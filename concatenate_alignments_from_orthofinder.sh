@@ -19,7 +19,7 @@ do
   awk '/^>/ {printf("\n%s\n",$0);next; } { printf("%s",$0);}  END {printf("\n");}' < ../${aln} > ${aln}_oneline;
   done;
 sed -i "s/>\([0-9]\+\)_.*/>\1/" *
-index=1
+index=0
 start=1
 rm raxml_partitionfile.txt
 for i in $(ls *_oneline)
