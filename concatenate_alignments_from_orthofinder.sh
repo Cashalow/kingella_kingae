@@ -24,9 +24,9 @@ start=1
 rm raxml_partitionfile.txt
 for i in $(ls *_oneline)
 do
-  length=$(tail -n -1 ${i} | wc -m);
-  echo "LG, prot${index} = ${start}-$(( start + length - 2 ))" >> raxml_partitionfile.txt
-  start=$(( start + length - 1 ));
+  length=$(tail -n -1 ${i} | tr -d '\n' | wc -m);
+  echo "LG, prot${index} = ${start}-$(( start + length - 1 ))" >> raxml_partitionfile.txt
+  start=$(( start + length ));
   index=$(( index + 1 ));
   done
   
