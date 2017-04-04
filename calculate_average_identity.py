@@ -8,7 +8,6 @@ def read_alignment(filename):
     return(Bio.AlignIO.parse(filename, "fasta"))
 
 
-
 def return_seqRec(aliRec):
     seqs={}
     for i in aliRec:
@@ -23,7 +22,7 @@ def return_avg_identity(seqRec):
         for j in seqRec.keys():
             matches=sum(aa1 == aa2 and aa1 != "-" for aa1, aa2 in zip(seqRec[i], seqRec[j]))
             unmatches=sum(aa1 == aa2 and aa1 == "-" for aa1, aa2 in zip(seqRec[i], seqRec[j]))
-            s+=str(matches/float(len(seqRec[j])-unmatches))+"\t"
+            s+=str(matches/float(len(seqRec[i])-unmatches))+"\t"
         print(s)
         
 
