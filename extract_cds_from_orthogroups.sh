@@ -2,21 +2,25 @@ orthoselect=$1
 
 #this is thefile with the names of the orthogroups to extract
 
-ids=/home/sacha/Documents/Kingella/comparative_genomics/orthofinder/kingella_neisseria/Results_Mar17/WorkingDirectory/SpeciesIDs.txt_cop 
+ids=$2
+#file with the species ID/names
 
-orthofile=/home/sacha/Documents/Kingella/comparative_genomics/orthofinder/kingella_neisseria/Results_Mar17/Orthogroups.csv
+orthofile=$3
+#csv file of the orthogroups 
 
-destfolder=/home/sacha/Documents/Kingella/comparative_genomics/genetic_alignment/second/
+destfolder=$4
 
 annotationfolder=/home/sacha/Documents/Kingella/annotations/
 
-mkdir $destfolder
+mkdir -p $destfolder/genelists/
+mkdir -p $destfolder/fastas/
 
-for i in $( tail -n +2 ${ids} | cut -f1 -d' ' | sed "s/://")
+for i in $( cat ${ids} | cut -f1 -d' ' | sed "s/://")
 do
+    echo ${i}
     col=$(( i+2 ))
     line=$(( i+1 ))
-    for j in $(cat ${orthoselect})
+    for j in $(cat ${orthoselect} | sed "s/.fa//")
     do
 	gi=$(grep $j ${orthofile} | cut -f ${col} | cut -d' ' -f1 )
     	echo ${i} ${gi} >> ${destfolder}/genelists/${j}.txt

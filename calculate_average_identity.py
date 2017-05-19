@@ -18,12 +18,13 @@ def return_seqRec(aliRec):
 def return_avg_identity(seqRec):
     print("\t"+"\t".join(seqRec.keys()))
     for i in seqRec.keys():
-        s=i+"\t"
+        id=i+"\t"
         for j in seqRec.keys():
             matches=sum(aa1 == aa2 and aa1 != "-" for aa1, aa2 in zip(seqRec[i], seqRec[j]))
-            unmatches=sum(aa1 == aa2 and aa1 == "-" for aa1, aa2 in zip(seqRec[i], seqRec[j]))
-            s+=str(matches/float(len(seqRec[i])-unmatches))+"\t"
-        print(s)
+            unmatches=sum(aa1 == "-" for aa1 in seqRec[i])
+            id+=str(matches/float(len(seqRec[i])-unmatches))+" ("+str(len(seqRec[i])-unmatches)+")\t"
+        print(id)
+        
         
 
 

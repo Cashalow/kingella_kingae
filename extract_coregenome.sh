@@ -3,11 +3,12 @@
 
 number_of_species=$1 #total number of species in the orthofinder run
 alignmentsid_folder=$2 #folder with the alignments and numbers as sole ids for species
+
 outfolder=${alignmentsid_folder}/coregenome/
 
 mkdir ${outfolder}
 
-grep ">" ${alignmentsid_folder}/*.fa -c | grep ".fa:${number_of_species}" | sed "s/:.*//" | xargs -I % basename %  > ${outfolder}/aln_${number_of_species}.txt #finds all orthogroups with entry number = number of species
+grep ">" ${alignmentsid_folder}/*.fa* -c | grep ":${number_of_species}" | sed "s/:.*//" | xargs -I % basename %  > ${outfolder}/aln_${number_of_species}.txt #finds all orthogroups with entry number = number of species
 
 rm ${outfolder}/aln_${number_of_species}_uniq.txt
 for file_name in $(cat ${outfolder}/aln_${number_of_species}.txt)
