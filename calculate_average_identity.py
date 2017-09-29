@@ -20,9 +20,13 @@ def return_avg_identity(seqRec):
     for i in seqRec.keys():
         id=i+"\t"
         for j in seqRec.keys():
-            matches=sum(aa1 == aa2 and aa1 != "-" for aa1, aa2 in zip(seqRec[i], seqRec[j]))
-            unmatches=sum(aa1 == "-" for aa1 in seqRec[i])
-            id+=str(matches/float(len(seqRec[i])-unmatches))+" ("+str(len(seqRec[i])-unmatches)+")\t"
+#            print(i)
+ #           print(j)
+            nogaps = sum(aa1 != "-" and aa2 != "-" for aa1, aa2 in zip(seqRec[i], seqRec[j]))
+            matches = sum(aa1 == aa2 and aa1 != "-" and aa1 != "n" and aa1 != "N" for aa1, aa2 in zip(seqRec[i], seqRec[j]))
+            seqlen = sum(aa1 != "-" for aa1 in seqRec[i])
+            aln = sum(aa1 != "-" and aa2 != "-" for aa1, aa2 in zip(seqRec[i], seqRec[j]))
+            id+="{:2.2f} ({:2.2f}%)\t".format(matches/float(nogaps)*100, aln/float(seqlen)*100)
         print(id)
         
         

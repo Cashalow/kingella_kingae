@@ -1,6 +1,6 @@
 orthoselect=$1
 
-#this is thefile with the names of the orthogroups to extract
+#this is the file with the names of the orthogroups to extract
 
 ids=$2
 #file with the species ID/names
@@ -10,7 +10,8 @@ orthofile=$3
 
 destfolder=$4
 
-annotationfolder=/home/sacha/Documents/Kingella/annotations/
+annotationfolder=$5
+#where the cds are
 
 mkdir -p $destfolder/genelists/
 mkdir -p $destfolder/fastas/
