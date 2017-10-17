@@ -3,4 +3,10 @@
 
 SELECT * from custom_tables.uniprot_go_terms_chlamydia_04_16 LEFT JOIN custom_tables.locus2seqfeature_id_chlamydia_04_16 on (uniprot_go_terms_chlamydia_04_16.seqfeature_id = locus2seqfeature_id_chlamydia_04_16.seqfeature_id ) where locus2seqfeature_id_chlamydia_04_16.locus_tag like "WCW_RS%" INTO OUTFILE "allgo.csv";
 
-select kegg_pathway.pathway_id, locus_tag, pathway2ko.ko_id, pathway_category_short, pathway_category, description from pathway2ko LEFT JOIN (locus2ko_chlamydia_04_16, kegg_pathway) on (locus2ko_chlamydia_04_16.ko_id = pathway2ko.ko_id and kegg_pathway.pathway_id = pathway2ko.pathway_id) where locus_tag like "WCW_RS%" INTO OUTFILE "kegg.csv";
+#extract all kegg anotations: 
+SELECT kegg_pathway.pathway_id, locus_tag, pathway2ko.ko_id, pathway_category_short, pathway_category, description from pathway2ko LEFT JOIN (locus2ko_chlamydia_04_16, kegg_pathway) on (locus2ko_chlamydia_04_16.ko_id = pathway2ko.ko_id and kegg_pathway.pathway_id = pathway2ko.pathway_id) where locus_tag like "WCW_RS%" INTO OUTFILE "kegg.csv";
+
+#extract COG anotations: 
+
+ SELECT DISTINCT description functon, locus_tag2gi_hit_chlamydia_04_16.locus_tag, cog_names_2014.COG_id, cog_names_2014.name FROM locus_tag2gi_hit_chlamydia_04_16 LEFT JOIN (cog_names_2014, code2category) ON (cog_names_2014.COG_id = locus_tag2gi_hit_chlamydia_04_16.COG_id  and code2category.code = cog_names_2014.functon) WHERE locus_tag2gi_hit_chlamydia_04_16.locus_tag LIKE "WCW_RS%" INTO OUTFILE "cog.csv";
+
