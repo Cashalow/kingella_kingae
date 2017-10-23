@@ -1,0 +1,7 @@
+name: rnaseq_R
+channels:
+ - bioconda
+dependencies:
+ - bioconductor-goseq = 1.26
+ - r-rmysql = 0.10.11
+ - r-stringr = 1.2.0
