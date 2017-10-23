@@ -5,3 +5,4 @@ dependencies:
  - bioconductor-goseq = 1.26
  - r-rmysql = 0.10.11
  - r-stringr = 1.2.0
+ - bioconductor-deseq2 = 1.14.1
