@@ -16,15 +16,24 @@ extract_significant_cat <- function(res){
 #read file with lengths
 
 all_data <- read.csv("/home/sacha/Documents/rna_seq/2017-04-27_LGR-6-17_Wchondrophila-DeSeq2.txt", stringsAsFactor=F, sep="\t")
+rownames(all_data) <- str_extract(all_data[,"Description"], "WCW_RS[0-9]+")
 
 only24144 <- read.csv("/home/sacha/Documents/rna_seq/2017-04-28_LGR-12-17_Wchondrophila-DeSeq2.txt", stringsAsFactor=F, sep="\t")
+rownames(only24144) <- str_extract(only24144[,"Description"], "WCW_RS[0-9]+")
 
-h24 <- str_extract(only24144[only24144[,"padj_144h.24h"]<0.05 & only24144[,"log2FoldChange_144h.24h"]<0,"Description"], "WCW_RS[0-9]+")
-h144 <- str_extract(only24144[only24144[,"padj_144h.24h"]<0.05 & only24144[,"log2FoldChange_144h.24h"]>0,"Description"], "WCW_RS[0-9]+")
+h24 <- rownames(only24144[only24144[,"padj_144h.24h"]<0.05 & only24144[,"log2FoldChange_144h.24h"]<0,])
+h144 <- rownames(only24144[only24144[,"padj_144h.24h"]<0.05 & only24144[,"log2FoldChange_144h.24h"]>0,])
 
-h24p001 <- str_extract(only24144[only24144[,"padj_144h.24h"]<0.01 & only24144[,"log2FoldChange_144h.24h"]<0,"Description"], "WCW_RS[0-9]+")
-h144p001 <- str_extract(only24144[only24144[,"padj_144h.24h"]<0.01 & only24144[,"log2FoldChange_144h.24h"]>0,"Description"], "WCW_RS[0-9]+")
+h24p001 <- rownames(only24144[only24144[,"padj_144h.24h"]<0.01 & only24144[,"log2FoldChange_144h.24h"]<0,])
+h144p001 <- rownames(only24144[only24144[,"padj_144h.24h"]<0.01 & only24144[,"log2FoldChange_144h.24h"]>0,])
 
+
+
+values <- matrix(as.numeric(unlist(all_data[, 25:33])), ,9)
+colnames(values) <- colnames(all_data[, 25:33])
+rownames(values) <- rownames(all_data)
+
+def <- str_extract(all_data[all_data[,"padj_6h.6h.def"]<0.01 & all_data[,"log2FoldChange_6h.6h.def"]<0,"Description"], "WCW_RS[0-9]+")
 
 
 h6p001 <- str_extract(all_data[all_data[,"padj_24h.6h"]<0.01 & all_data[,"log2FoldChange_24h.6h"]<0,"Description"], "WCW_RS[0-9]+")
@@ -40,7 +49,20 @@ names(gene_lengths) <- str_extract(all_data[,"Description"], "WCW_RS[0-9]+")
 
 #read corres between locus tag and seqfeature id
 
+read_horn <- read.csv("/home/sacha/Documents/rna_seq/horn_res.csv", sep="\t", header=TRUE, stringsAsFactors=F)
+res_horn<- matrix(as.numeric(unlist(read_horn[,c("X2.hpi_1", "X2.hpi_2", "X2.hpi_3", "X48.hpi_1", "X48.hpi_2" ,"X48.hpi_3", "X96.hpi_1" , "X96.hpi_2", "X96.hpi_3", "extracellular_1" , "extracellular_2"  , "extracellular_3" )])), ,12)
+res_horn <- res_horn[complete.cases(res_horn),]
+scaled_res <-  scale(res_horn, center=TRUE, scale=FALSE)
+means <- c()
+for (i in 0:3){
+    means<-cbind(means, rowMeans(scaled_res[,(i*3+1):((i+1)*3)]))    
+}
 
+means2 <- c()
+for (i in 0:3){
+    means2<-cbind(means2, rowMeans(res_horn[,(i*3+1):((i+1)*3)]))    
+}
+scaled_res2 <- scale(means2, center=TRUE, scale=FALSE)
 
 allgo <- read.csv("/home/sacha/Documents/rna_seq/allgo.csv", sep="\t", header=FALSE, stringsAsFactors=F, col.names=c("seqID", "GO", "description", "locus_tag", "seqID2", "taxID"))
 gos_wcw <- data.frame(cbind(allgo[,"locus_tag"], allgo["description"]))
@@ -51,7 +73,8 @@ kegg_wcw <- data.frame(cbind(allkegg[,"locus_tag"], allkegg["general"]))
 allcog <- read.csv("/home/sacha/Documents/rna_seq/cog.csv", sep="\t", header=FALSE, stringsAsFactors=F, col.names=c("category","locus_tag", "COG_ID", "description"))
 cog_wcw <- data.frame(cbind(allcog[,"locus_tag"], allcog["category"]))
 
-gosh6 <- calculate_goseq(h6, gene_lengths, gos_wcw)
+gosh6vs24 <- calculate_goseq(h6p001, gene_lengths, gos_wcw)
+gosh6vs144 <- calculate_goseq(h6vs144p001, gene_lengths, gos_wcw)
 
 gosh24 <- calculate_goseq(h24, gene_lengths, gos_wcw)
 gosh144 <- calculate_goseq(h144, gene_lengths, gos_wcw)
@@ -64,7 +87,11 @@ for (i in list(gosh24, gosh24p001, gosh144, gosh144p001)){
     }
 
 
-keggh6 <- calculate_goseq(h6, gene_lengths, kegg_wcw)
+
+
+
+keggh6vs24 <- calculate_goseq(h6p001, gene_lengths, kegg_wcw)
+keggh6vs144 <- calculate_goseq(h6vs144p001, gene_lengths, kegg_wcw)
 
 keggh24 <- calculate_goseq(h24, gene_lengths, kegg_wcw)
 keggh144 <- calculate_goseq(h144, gene_lengths, kegg_wcw)
@@ -78,7 +105,8 @@ for (i in list(keggh24, keggh24p001, keggh144, keggh144p001)){
 
 
 
-cogh6 <- calculate_goseq(h6, gene_lengths, cog_wcw)
+
+cogh6 <- calculate_goseq(h6p001, gene_lengths, cog_wcw)
 
 cogh24 <- calculate_goseq(h24, gene_lengths, cog_wcw)
 cogh144 <- calculate_goseq(h144, gene_lengths, cog_wcw)
