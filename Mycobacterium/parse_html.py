@@ -9,7 +9,10 @@ from dateutil import parser
 def extract_data(filename):
     dic={}
     soup=bs(open(filename).read(), "html.parser")
-
+    for mdr in soup.find_all("li"):
+        if "Patient: " in mdr.get_text():
+            patient="".join(mdr.get_text().replace("Patient:", "").split())
+            
     for lol in soup.find_all("h5"):
         if lol.get_text() =="Genomes":
             table=lol.find_next("table")
@@ -20,6 +23,7 @@ def extract_data(filename):
                 cells=u.findAll("td")
                 v=[s.strip() for s in [k.get_text() for k in cells]]
                 dic[v[0]]={}
+                dic[v[0]]["Patient"]=patient
                 for i in range(1,8):
                     if l[i]=="Specimen Collected Date":
                         dic[v[0]]["Specimen_Collected_Date"]=parser.parse(v[i]).strftime('%Y-%m-%d')
@@ -75,20 +79,25 @@ for i in files:
      
 
 tests = ["Lowenstein-Jensen", "Bactec", "GeneXpert", "Hain", "DST"]
-info = ["Specimen","Bio_Project","Material","Specimen_Collected_Date","Sequence_Read_Archive","Bio_Sample","Lineage","Octal_Spoligotype"]
-antibio = ["Specimen","Date", 'H', 'R', 'S', 'E', 'Ofx', 'Cm', 'Am', 'Km', 'Z', 'Lfx', 'Mfx', 'Pas', 'Pto', 'Cs', 'Amx/Clv', 'Mb', 'Dld', 'Bdq', 'Ipm/Cln', 'Lzd', 'Cfz', 'Clr', 'Ft', 'AG/CP', 'Action']
+info = ["Specimen","Patient","Bio_Project","Material","Specimen_Collected_Date", "Bio_Sample","Lineage","Octal_Spoligotype"]
+antibio = ["Specimen","test","Date", 'H', 'R', 'S', 'E', 'Ofx', 'Cm', 'Am', 'Km', 'Z', 'Lfx', 'Mfx', 'Pas', 'Pto', 'Cs', 'Amx/Clv', 'Mb', 'Dld', 'Bdq', 'Ipm/Cln', 'Lzd', 'Cfz', 'Clr', 'Ft', 'AG/CP', 'Action']
 
+deli="\t"
 with open("samples.csv", "w") as f:
-    w = csv.DictWriter(f, None)
+    w = csv.DictWriter(f, None, delimiter=deli)
     w.fieldnames = info
     w.writeheader()
 
 
-for f in tests:
-    with open(f+".csv", "w") as f:
-        w = csv.DictWriter(f, None)
-        w.fieldnames = antibio
-        w.writeheader()
+with open("test.csv", "w") as f:
+    w = csv.DictWriter(f, None, delimiter=deli)
+    w.fieldnames = antibio
+    w.writeheader()
+
+with open("sras.csv", "w") as f:
+    w = csv.DictWriter(f, None, delimiter=deli)
+    w.fieldnames=["Specimen", "Sequence_Read_Archive"]
+    w.writeheader()
 
 print(final_dic.keys())
 with open('samples.csv', 'a') as f:
@@ -96,22 +105,27 @@ with open('samples.csv', 'a') as f:
         tmp = {}
         tmp["Specimen"]=i
         tmp = {** tmp, ** {k: final_dic[i][k] for k in info[1:]}}
-        w = csv.DictWriter(f, tmp)
+        w = csv.DictWriter(f, tmp, delimiter=deli)
         w.fieldnames=info
         w.writerow(tmp)
+        with open("sras.csv", "a") as u:
+            for sras in final_dic[i]["Sequence_Read_Archive"].split(","):
+                u.write(i+deli+sras.replace(" ", "")+"\n")
         tests_made = [val for val in tests if val in list(final_dic[i].keys())]
-        for test in tests_made:
-            with open(test+".csv", "a") as g:
+        with open("test.csv", "a") as g:
+            for test in tests_made:
                 tmpres = {}
-                tmpres["Specimen"]=i
+                tmpres["Specimen"] = i
+                tmpres["test"] = test
                 tmpres = {** tmpres, ** final_dic[i][test]}
-                w = csv.DictWriter(g, tmpres)
+                w = csv.DictWriter(g, tmpres, delimiter=deli)
                 w.fieldnames=antibio
                 w.writerow(tmpres)
         
         
         
 with open("file_correspondance.csv", "w") as f:
+    f.write("Speciment\tID\n")
     for i in final_dic.keys():
-        f.write(i+","+final_dic[i]["Filename"].replace(".", "").replace("/", "")+"\n")
+        f.write(i+deli+final_dic[i]["Filename"].replace(".", "").replace("/", "")+"\n")
 
