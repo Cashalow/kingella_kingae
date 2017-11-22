@@ -1,7 +1,7 @@
 #/bin/bash
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-esearch -db assembly -query "Elizabethkingia" | efetch -db assembly -format docsum | xtract -pattern DocumentSummary -if RefSeq -element SpeciesName FtpPath_RefSeq > refseq_ftp.txt
+esearch -db assembly -query "Elizabethkingia" | efetch -db assembly -format docsum | xtract -pattern DocumentSummary -if RefSeq -unless LatestAccession -element SpeciesName FtpPath_RefSeq > refseq_ftp.txt
 cut -f 2 refseq_ftp.txt  | sed "s/\(\/GCF_.*\)/\1\1_genomic.gbff.gz/" > refseq_genbanks.txt
 mkdir -p gbks && cd gbks
 while read p;
